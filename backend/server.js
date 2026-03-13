@@ -18,6 +18,17 @@ app.get('/api/tasks', async (req, res) => {
     }
 });
 
+// get one single task
+app.get('/api/tasks/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const task = await Task.findById(id);
+        res.status(200).json(task);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 
 // Create a new task
 app.post('/api/tasks', async (req, res) => {
