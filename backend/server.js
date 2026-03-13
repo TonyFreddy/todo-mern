@@ -1,22 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Task = require('./models/task.model');
+const taskRoute = require("./routes/task.route");
 const PORT = 4000;
 
 const app = express();
 app.use(express.json());
 
 
+// @taskRoute
+app.use('/api/tasks' , taskRoute);
 
-//Get all the tasks
-app.get('/api/tasks', async (req, res) => {
-    try {
-        const task = await Task.find({});
-        res.status(200).json(task);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
 
 // get one single task
 app.get('/api/tasks/:id', async (req, res) => {
