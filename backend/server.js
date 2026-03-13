@@ -6,6 +6,19 @@ const PORT = 4000;
 const app = express();
 app.use(express.json());
 
+
+
+//Get all the tasks
+app.get('/api/tasks', async (req, res) => {
+    try {
+        const task = await Task.find({});
+        res.status(200).json(task);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+
 // Create a new task
 app.post('/api/tasks', async (req, res) => {
     try {
