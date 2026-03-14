@@ -1,10 +1,10 @@
 import { useState } from "react";
-import {}
+import { FaTrash , FaRegCircle , FaCheckCircle , FaTasks } from 'react-icons/fa'
 
 const App = () => {
   return (
-    <div>
-      <h1 className=""> Mern Stack Todo App </h1>
+    <div className="py-50">
+     
     </div>
   )
 }
