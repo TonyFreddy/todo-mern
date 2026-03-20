@@ -1,8 +1,29 @@
-import { useState } from "react";
-import { FaTrash, FaRegCircle, FaCheckCircle, FaTasks } from 'react-icons/fa'
+import { useState , useEffect } from "react";
+import axios from "axios";
+import { FaTrash, FaRegCircle, FaCheckCircle, FaTasks } from 'react-icons/fa';
+
+
+//Toast Error
+import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"
+
+
+
 
 const App = () => {
+ 
+  //useState Hooks
+  const [tasks , setTasks ] = useState([]);
+  const [task , setTask ] = useState("");
   const [color, setColor] = useState("gray");
+
+  //API_URL
+  const API_URL = "http://localhost:4000/api/tasks";
+
+
+
+
   return (
     <div className="py-50 px-10 min-h-screen w-full bg-gray-900 flex items-center justify-center text-white">
 
@@ -190,8 +211,12 @@ const App = () => {
        </ul>
 
       </div>
+    
+    <ToastContainer/>
+
+
     </div>
-  )
-}
+  );
+};
 
 export default App;
