@@ -4,9 +4,14 @@ const Task = require('./models/task.model');
 const taskRoute = require("./routes/task.route");
 const connectDB = require("./db/db");
 const PORT = 4000;
+const cors = require('cors');
 
 const app = express();
 app.use(express.json());
+app.use(cors({
+    origin:'http://localhost/3000',
+})
+);
 
 
 // @taskRoute

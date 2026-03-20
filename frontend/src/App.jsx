@@ -21,8 +21,22 @@ const App = () => {
   //API_URL
   const API_URL = "http://localhost:4000/api/tasks";
 
+  // Fetch the Tasks 
+  const fetchTasks = async () => {
+    try {
+     const res = await axios.get(API_URL);
+     setTasks(res.data); 
+    } catch (error) {
+      console.error("Error fetching tasks" , error)
+    }
+  };
 
+  // @useEffect
+  useEffect( () =>{
+    fetchTasks();
+  }, []);
 
+  console.log(tasks);
 
   return (
     <div className="py-50 px-10 min-h-screen w-full bg-gray-900 flex items-center justify-center text-white">
