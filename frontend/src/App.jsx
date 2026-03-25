@@ -1,42 +1,89 @@
-import { useState , useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaTrash, FaRegCircle, FaCheckCircle, FaTasks } from 'react-icons/fa';
-
-
-//Toast Error
-import { toast } from "react-toastify";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"
-
-
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
- 
-  //useState Hooks
-  const [tasks , setTasks ] = useState([]);
-  const [task , setTask ] = useState("");
+
+  const [tasks, setTasks] = useState([]);
+  const [task, setTask] = useState("");
   const [color, setColor] = useState("gray");
 
-  //API_URL
   const API_URL = "http://localhost:4000/api/tasks";
 
-  // Fetch the Tasks 
+  const colorStyles = {
+    red:    { text: "text-red-400",    border: "border-red-400"    },
+    blue:   { text: "text-blue-500",   border: "border-blue-500"   },
+    green:  { text: "text-green-400",  border: "border-green-400"  },
+    yellow: { text: "text-yellow-400", border: "border-yellow-400" },
+    pink:   { text: "text-pink-500",   border: "border-pink-500"   },
+    gray:   { text: "text-gray-400",   border: "border-gray-400"   },
+  };
+
+  const colors = ["red", "blue", "green", "yellow", "pink", "gray"];
+
+  const bgColors = {
+    red:    "bg-red-500",
+    blue:   "bg-blue-500",
+    green:  "bg-green-500",
+    yellow: "bg-yellow-500",
+    pink:   "bg-pink-500",
+    gray:   "bg-gray-300",
+  };
+
+  // GET - Fetch all tasks
   const fetchTasks = async () => {
     try {
-     const res = await axios.get(API_URL);
-     setTasks(res.data); 
+      const res = await axios.get(API_URL);
+      setTasks(res.data);
     } catch (error) {
-      console.error("Error fetching tasks" , error)
+      toast.error("Error fetching tasks");
     }
   };
 
-  // @useEffect
-  useEffect( () =>{
+  useEffect(() => {
     fetchTasks();
   }, []);
 
-  console.log(tasks);
+  // POST - Create a task
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!task.trim()) {
+      toast.warning("Please write a task first");
+      return;
+    }
+    try {
+      await axios.post(API_URL, { task, color });
+      setTask("");
+      setColor("gray");
+      fetchTasks();
+      toast.success("Task created successfully");
+    } catch (error) {
+      toast.error("Error creating task");
+    }
+  };
+
+  // DELETE - Delete a task
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      fetchTasks();
+      toast.success("Task deleted successfully");
+    } catch (error) {
+      toast.error("Error deleting task");
+    }
+  };
+
+  // PUT - Toggle taskDone
+  const handleToggle = async (t) => {
+    try {
+      await axios.put(`${API_URL}/${t._id}`, { taskDone: !t.taskDone });
+      fetchTasks();
+    } catch (error) {
+      toast.error("Error updating task");
+    }
+  };
 
   return (
     <div className="py-50 px-10 min-h-screen w-full bg-gray-900 flex items-center justify-center text-white">
@@ -46,191 +93,107 @@ const App = () => {
 
         {/* Header */}
         <div className="bg-gray-800 w-full h-fit p-5 rounded-xl flex items-center justify-between gap-5">
-
-          {/* Left */}
           <div>
             <h1 className="text-3xl mb-2">Codiarc Planner</h1>
             <p className="text-sm text-zinc-400">
               Use this app to remember whatever you want to do
             </p>
           </div>
-
-          {/* Right */}
           <div className="text-5xl text-gray-400">
             <FaTasks />
           </div>
-
         </div>
 
         {/* Form */}
-        <form className="bg-gray-800 flex justify-between gap-5 p-5 rounded-xl mt-3 w-full">
+        <form onSubmit={handleSubmit} className="bg-gray-800 flex justify-between gap-5 p-5 rounded-xl mt-3 w-full">
           <input
             type="text"
             placeholder="Write your task here ..."
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
             className="px-3 py-2 bg-gray-900 w-full rounded-md outline-0"
           />
 
           {/* Colors */}
           <div className="flex items-center gap-4">
-
-            {/* Red */}
-            <label className="cursor-pointer">
-              <input
-                type="radio"
-                name="color"
-                value="red"
-                checked={color === "red"}
-                onChange={(e) => setColor(e.target.value)}
-                className="hidden"
-              />
-              <span className={`w-6 h-6 rounded-full bg-red-500 block ${color === "red" ? "border-2 border-white"
-                 : "border-2 border-transparent"}`}>
-              </span>
-            </label>
-
-                   {/* Blue */}
-            <label className="cursor-pointer">
-              <input
-                type="radio"
-                name="color"
-                value="blue"
-                checked={color === "blue"}
-                onChange={(e) => setColor(e.target.value)}
-                className="hidden"
-              />
-              <span className={`w-6 h-6 rounded-full bg-blue-500 block ${color === "blue" ? "border-2 border-white"
-                 : "border-2 border-transparent"}`}>
-              </span>
-            </label>
-
-                         {/* Green */}
-            <label className="cursor-pointer">
-              <input
-                type="radio"
-                name="color"
-                value="green"
-                checked={color === "green"}
-                onChange={(e) => setColor(e.target.value)}
-                className="hidden"
-              />
-              <span className={`w-6 h-6 rounded-full bg-green-500 block ${color === "green" ? "border-2 border-white"
-                 : "border-2 border-transparent"}`}>
-              </span>
-            </label>
-
-                         {/* Yellow */}
-            <label className="cursor-pointer">
-              <input
-                type="radio"
-                name="color"
-                value="yellow"
-                checked={color === "yellow"}
-                onChange={(e) => setColor(e.target.value)}
-                className="hidden"
-              />
-              <span className={`w-6 h-6 rounded-full bg-yellow-500 block ${color === "yellow" ? "border-2 border-white"
-                 : "border-2 border-transparent"}`}>
-              </span>
-            </label>
-
-                         {/* Pink */}
-            <label className="cursor-pointer">
-              <input
-                type="radio"
-                name="color"
-                value="pink"
-                checked={color === "pink"}
-                onChange={(e) => setColor(e.target.value)}
-                className="hidden"
-              />
-              <span className={`w-6 h-6 rounded-full bg-pink-500 block ${color === "pink" ? "border-2 border-white"
-                 : "border-2 border-transparent"}`}>
-              </span>
-            </label>
-
-                         {/* Gray */}
-            <label className="cursor-pointer">
-              <input
-                type="radio"
-                name="color"
-                value="gray"
-                checked={color === "gray"}
-                onChange={(e) => setColor(e.target.value)}
-                className="hidden"
-              />
-              <span className={`w-6 h-6 rounded-full bg-gray-300 block ${color === "gray" ? "border-2 border-white"
-                 : "border-2 border-transparent"}`}>
-              </span>
-            </label>
+            {colors.map((c) => (
+              <label key={c} className="cursor-pointer">
+                <input
+                  type="radio"
+                  name="color"
+                  value={c}
+                  checked={color === c}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="hidden"
+                />
+                <span className={`w-6 h-6 rounded-full ${bgColors[c]} block ${color === c ? "border-2 border-white" : "border-2 border-transparent"}`}>
+                </span>
+              </label>
+            ))}
           </div>
 
-          <button className="bg-red-600 hover:bg-red-700 px-3 py-2 rounded-md cursor-pointer "> 
-            {" "}
-            Submit{" "}
-           </button>
+          <button type="submit" className="bg-red-600 hover:bg-red-700 px-3 py-2 rounded-md cursor-pointer">
+            Submit
+          </button>
         </form>
-      
-      {/* Tasks */}
-       
-       <ul className="flex flex-col gap-2 w-full mt-3">
-            {/* Task */}
 
-            <li className="w-full bg-gray-950 px-6 py-5 rounded-xl flex justify-between">
-               {/* Content */}
-              
-              <div className="border-l-5 border-red-400 pl-3 rounded-md">
-                 <p className="text-xl mb-1">
-                This is a sample task for showing the template and learn
-              </p>
-              <span className="text-5m text-zinc-400">Created On</span> {" "}
-              <span className="text-5m text-red-400 font-bold">Tuesday</span> {" "}
-              <span className="text-5m text-red-400"> March 19 2026 - 12 AM </span>
-              </div>  
-               
-               {/* Button */}
-               <div className="flex items-center gap-3">
-              <button className="text-red-500 cursor-pointer" >
-                <FaTrash/>
-              </button>
+        {/* Tasks */}
+        <ul className="flex flex-col gap-2 w-full mt-3">
+          {tasks.map((t) => (
+            <li key={t._id} className={`w-full bg-gray-950 px-6 py-5 rounded-xl flex justify-between ${t.taskDone ? "opacity-50" : ""}`}>
 
-              <button className="text-gray-400 cursor-pointer text-lg">
-               <FaRegCircle/>
-              </button>
+              {/* Content */}
+              <div className={`border-l-4 ${colorStyles[t.color]?.border} pl-3 rounded-md`}>
+                <p className={`text-xl mb-1 ${t.taskDone ? "line-through text-zinc-500" : ""}`}>
+                  {t.task}
+                </p>
+                <span className="text-sm text-zinc-400">Created On</span>{" "}
+                <span className={`text-sm ${colorStyles[t.color]?.text}`}>
+                  {new Date(t.createdAt).toLocaleDateString("en-US", { weekday: "long" })}
+                </span>{" "}
+                <span className={`text-sm ${colorStyles[t.color]?.text}`}>
+                  {new Date(t.createdAt).toLocaleDateString("en-US", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                  {" - "}
+                  {new Date(t.createdAt).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
               </div>
-            </li>
 
-               <li className="w-full bg-gray-950 px-6 py-5 rounded-xl flex justify-between">
-               {/* Content */}
-              
-              <div className="border-l-5 border-blue-400 pl-3 rounded-md">
-                 <p className="text-xl mb-1 line-through text-gray-400">
-                This is a sample task for showing the template and learn
-              </p>
-              <span className="text-5m text-zinc-400">Created On</span> {" "}
-              <span className="text-5m text-blue-400 font-bold">Tuesday</span> {" "}
-              <span className="text-5m text-blue-400"> March 19 2026 - 12 AM </span>
-              </div>  
-               
-               {/* Button */}
-               <div className="flex items-center gap-3">
-              <button className="text-blue-500 cursor-pointer" >
-                <FaTrash/>
-              </button>
-
-              <button className="text-gray-400 cursor-pointer text-lg">
-               <FaCheckCircle/>
-              </button>
+              {/* Buttons */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleDelete(t._id)}
+                  className="text-red-500 cursor-pointer hover:text-red-400">
+                  <FaTrash />
+                </button>
+                <button
+                  onClick={() => handleToggle(t)}
+                  className={`cursor-pointer text-lg ${t.taskDone ? "text-green-400" : "text-gray-400"}`}>
+                  {t.taskDone ? <FaCheckCircle /> : <FaRegCircle />}
+                </button>
               </div>
+
             </li>
-       </ul>
+          ))}
+        </ul>
+
+        {/* Empty state */}
+        {tasks.length === 0 && (
+          <p className="text-center text-zinc-500 mt-10">No tasks yet. Add one above!</p>
+        )}
 
       </div>
-    
-    <ToastContainer/>
 
+      <ToastContainer />
 
     </div>
   );
 };
 
-export default App;
+export default App; 
